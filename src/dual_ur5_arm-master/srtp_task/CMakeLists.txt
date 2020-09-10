@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8.3)
 project(srtp_task)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
-add_compile_options(-std=c++11)
+add_compile_options(-std=c++14)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
@@ -122,7 +122,8 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
-# include
+#  include
+  include
   ${catkin_INCLUDE_DIRS}
 )
 
@@ -198,12 +199,17 @@ include_directories(
 #   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 # )
 
-add_executable(srtp_task src/srtp_task.cpp)
-target_link_libraries(srtp_task
+add_executable(dual_arm_test src/dual_arm_test.cpp)
+target_link_libraries(dual_arm_test
   ${catkin_LIBRARIES} 
 )
 add_executable(stl_rviz_test src/stl_rviz_test.cpp)
 target_link_libraries(stl_rviz_test
+  ${catkin_LIBRARIES} 
+)
+
+add_executable(continuous_action_test src/continuous_action_test.cpp src/time_optimal_trajectory_generation.cpp)
+target_link_libraries(continuous_action_test
   ${catkin_LIBRARIES} 
 )
 

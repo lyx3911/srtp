@@ -18,6 +18,8 @@
     <group name="dual_arms">
         <group name="left_arm" />
         <group name="right_arm" />
+        <group name="left_gripper" />
+        <group name="right_gripper" />
     </group>
     <group name="left_gripper">
         <link name="left_rh_p12_rn_base" />
