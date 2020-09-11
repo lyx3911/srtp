@@ -18,6 +18,11 @@
 #include <geometric_shapes/shape_operations.h>
 #include <geometric_shapes/mesh_operations.h>
 
+#include <dual_arm.h>
+
+
+std::vector<moveit_msgs::CollisionObject> chair_components;
+
 
 void addChairComponents(moveit::planning_interface::PlanningSceneInterface &planning_scene_interface)
 {
@@ -36,7 +41,7 @@ void addChairComponents(moveit::planning_interface::PlanningSceneInterface &plan
 
 	geometry_msgs::Pose chair_surface_pose;
 	chair_surface_pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(0,M_PI,0);
-    chair_surface_pose.position.x =  0.5;
+    chair_surface_pose.position.x =  0.4;
     chair_surface_pose.position.y =  0.0;
     chair_surface_pose.position.z =  0.0;
 
@@ -61,8 +66,8 @@ void addChairComponents(moveit::planning_interface::PlanningSceneInterface &plan
 
     	geometry_msgs::Pose chair_leg_pose;
 		chair_leg_pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(0,-M_PI/2,0);
-	    chair_leg_pose.position.x =  0.7;
-	    chair_leg_pose.position.y =  -0.15+0.1*i;
+	    chair_leg_pose.position.x =  0.6;
+	    chair_leg_pose.position.y = 0.30-0.2*i + 0.07;
 	    chair_leg_pose.position.z =  -0.1;
 
 	   	chair_leg.meshes.push_back(chair_leg_mesh);
@@ -101,7 +106,6 @@ void addChairComponents(moveit::planning_interface::PlanningSceneInterface &plan
 // only for test
 void chairSTL(moveit::planning_interface::PlanningSceneInterface &planning_scene_interface)
 {
-	std::vector<moveit_msgs::CollisionObject> chair_components;
 
 	//chair surface
 	moveit_msgs::CollisionObject chair_surface;
@@ -177,6 +181,8 @@ void chairSTL(moveit::planning_interface::PlanningSceneInterface &planning_scene
     planning_scene_interface.addCollisionObjects(chair_components);
 }
 
+
+
 int main(int argc, char **argv)
 {
 	ros::init(argc,argv,"stl_rviz_test");
@@ -184,18 +190,61 @@ int main(int argc, char **argv)
 	ros::AsyncSpinner spinner(1);
 	spinner.start();
 
-	static const std::string PLANNINH_GROUP = "dual_arms";
-	moveit::planning_interface::MoveGroupInterface group(PLANNINH_GROUP);
 	moveit::planning_interface::PlanningSceneInterface planning_scene_interface;
+
+	//初始化双臂模型
+	dual_arm dual_ur5(node_handle);
+	dual_ur5.init();
+
+	//添加椅子模型
+	addChairComponents(planning_scene_interface);
+	// chairSTL(planning_scene_interface);
+
+
+    dual_ur5.perform_action(0.65, 0.30, 0.1, 0, M_PI/2, 0, 0.65, -0.10, 0.1, 0, M_PI/2, 0, 0.08, 0.08);
+	dual_ur5.grasp(0.04, 0.04);
+	dual_ur5.left_gripper.attachObject("chair_leg0");
+	dual_ur5.right_gripper.attachObject("chair_leg2");
+
+	// dual_ur5.perform_action(0.33, 0.2, 0.10, 0, 0, -M_PI/2, 0.33, -0.2, 0.10, 0, 0, M_PI/2, 0.04, 0.04);
+	dual_ur5.perform_action(0.33, 0.2, 0.07, 0, 0, -M_PI/2, 0.33, -0.2, 0.07, 0, 0, M_PI/2, 0.04, 0.04);
+	dual_ur5.grasp(0.08, 0.08);
+	dual_ur5.right_gripper.detachObject("chair_leg2");
+	dual_ur5.left_gripper.detachObject("chair_leg0");
+
+
+	dual_ur5.perform_action(0.65, 0.10, 0.1, 0, M_PI/2, 0, 0.65, -0.30, 0.1, 0, M_PI/2, 0, 0.08, 0.08);
+	dual_ur5.grasp(0.04, 0.04);
+	dual_ur5.left_gripper.attachObject("chair_leg1");
+	dual_ur5.right_gripper.attachObject("chair_leg3");
+
+	// dual_ur5.perform_action(0.47, 0.2, 0.10, 0, 0, -M_PI/2, 0.47, -0.2, 0.10, 0, 0, M_PI/2, 0.04, 0.04);
+	dual_ur5.perform_action(0.47, 0.2, 0.07, 0, 0, -M_PI/2, 0.47, -0.2, 0.07, 0, 0, M_PI/2, 0.04, 0.04);
+	dual_ur5.grasp(0.08, 0.08);
+	dual_ur5.right_gripper.detachObject("chair_leg3");
+	dual_ur5.left_gripper.detachObject("chair_leg1");
 	
-	moveit::planning_interface::MoveGroupInterface left_gripper("left_gripper");
-	moveit::planning_interface::MoveGroupInterface right_gripper("right_gripper");
 
-	const robot_state::JointModelGroup* joint_model_group =  
-		group.getCurrentState()->getJointModelGroup(PLANNINH_GROUP);
+	dual_ur5.perform_action(0.5, 0.57, 0.29, 0, M_PI/2, 0,       0.20, -0.07, 0.07, 0, 0, 0, 0.08, 0.08);
+	dual_ur5.grasp(0.04,0.04);
+	dual_ur5.right_gripper.attachObject("chair_leg0");
+	dual_ur5.right_gripper.attachObject("chair_leg1");
+	dual_ur5.right_gripper.attachObject("chair_leg2");
+	dual_ur5.right_gripper.attachObject("chair_leg3");
+	dual_ur5.left_gripper.attachObject("chair_back");
+	dual_ur5.right_gripper.attachObject("chair_surface");
+	dual_ur5.perform_action(0.4, 0.35, 0.21, M_PI/2, 0, -M_PI/2, 0.20, -0.1, 0.07, M_PI/2, 0, 0, 0.08, 0.08);
 
-	// addChairComponents(planning_scene_interface);
-	chairSTL(planning_scene_interface);
+	double y_left = 0.35, y_right = -0.1;
+	while(y_right < y_left)
+	{
+		y_left -= 0.01;
+		y_right += 0.01;
+		bool success = dual_ur5.perform_action(0.4, y_left, 0.22, M_PI/2, 0, -M_PI/2, 0.20, y_right, 0.07, M_PI/2, 0, 0, 0.08, 0.08);
+		if(!success) break;
+		std::cout << y_left << "  " << y_right << std::endl;
+	}
+
 	ros::shutdown();
 	return 0;
 }

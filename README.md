@@ -99,6 +99,12 @@ rosrun srtp_task dual_arm_test
 rosrun srtp_task continuous_action_test
 ```
 
+双臂装椅子demo（待改进）
+
+```bash
+rosrun srtp_task assemble_test
+```
+
 
 
 ## 代码说明：

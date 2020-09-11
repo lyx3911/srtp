@@ -177,7 +177,7 @@ right_arm:
   projection_evaluator: joints(right_shoulder_pan_joint,right_shoulder_lift_joint)
   longest_valid_segment_fraction: 0.005
 dual_arms:
-  default_planner_config: None
+  default_planner_config: ""
   planner_configs:
     - SBL
     - EST

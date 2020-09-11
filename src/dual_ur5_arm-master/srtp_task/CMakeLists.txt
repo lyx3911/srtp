@@ -213,6 +213,10 @@ target_link_libraries(continuous_action_test
   ${catkin_LIBRARIES} 
 )
 
+add_executable(assemble_test src/assemble_test.cpp src/dual_arm.cpp src/time_optimal_trajectory_generation.cpp)
+target_link_libraries(assemble_test
+  ${catkin_LIBRARIES} 
+)
 
 
 #############
