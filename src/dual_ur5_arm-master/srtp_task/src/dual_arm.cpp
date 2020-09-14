@@ -48,8 +48,11 @@ std::vector <double> dual_arm::get_armjoint_values(geometry_msgs::Pose target_po
 	arm_group.setPoseTarget(target_pose);
 	moveit::planning_interface::MoveGroupInterface::Plan plan;
 	bool success = false;
-	while(!success)
+	int cnt = 0;
+	while(!success){
 		success = (arm_group.plan(plan) == moveit::planning_interface::MoveItErrorCode::SUCCESS);
+		if(cnt++>10) {std::cout << "IK_solve_failed" << std::endl; break;}
+	}
 	moveit_msgs::RobotTrajectory trajectory = plan.trajectory_;
 	int size = trajectory.joint_trajectory.points.size();
 	// std::cout << trajectory.joint_trajectory.points[size-1].positions[0] << std::endl;
@@ -112,6 +115,12 @@ void dual_arm::grasp(double left_len, double right_len)
     moveit::planning_interface::MoveGroupInterface::Plan plan;
     bool success = (group.plan(plan) == moveit::planning_interface::MoveItErrorCode::SUCCESS);
 
+	int cnt =0;
+	while(!success){
+		success = (group.plan(plan) == moveit::planning_interface::MoveItErrorCode::SUCCESS);
+		if(cnt++ > 10) break;
+	}
+
     if(!success){
         ROS_INFO("grasp error");
     }
@@ -136,6 +145,10 @@ bool dual_arm::perform_action(double left_x, double left_y, double left_z, doubl
     std::vector<double>left_joints = get_armjoint_values(target_pose_left,left_arm);
     setJointValues(left_joints, left_arm);
 
+	std::cout << "left_arm_joint: " ;
+	for(double value:left_joints)	std::cout << value << " \t" ;
+	std::cout << std::endl; 
+
     //right_arm
     geometry_msgs::Pose target_pose_right;
     target_pose_right.orientation = tf::createQuaternionMsgFromRollPitchYaw(right_roll, right_pitch, right_yaw);
@@ -144,6 +157,10 @@ bool dual_arm::perform_action(double left_x, double left_y, double left_z, doubl
     target_pose_right.position.z = right_z;
     std::vector<double>right_joints = get_armjoint_values(target_pose_right, right_arm);
     setJointValues(right_joints, right_arm);
+
+	std::cout << "right_arm_joint: " ;
+	for(double value:right_joints)	std::cout << value << " \t" ;
+	std::cout << std::endl; 
 
     //left_gripper
     std::vector<double> left_gripper_joints = gripper_open_config(open_left);

@@ -1,0 +1,11 @@
+moveit_setup_assistant_config:
+  URDF:
+    package: ur_description
+    relative_path: urdf/dual_ur5_limited.urdf
+    xacro_args: "--inorder "
+  SRDF:
+    relative_path: config/ur5.srdf
+  CONFIG:
+    author_name: lyx
+    author_email: 3170103138@zju.edu.cn
+    generated_timestamp: 1600069720

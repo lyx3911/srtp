@@ -223,24 +223,31 @@ int main(int argc, char **argv)
 	dual_ur5.grasp(0.08, 0.08);
 	dual_ur5.right_gripper.detachObject("chair_leg3");
 	dual_ur5.left_gripper.detachObject("chair_leg1");
-	
+
 
 	dual_ur5.perform_action(0.5, 0.57, 0.29, 0, M_PI/2, 0,       0.20, -0.07, 0.07, 0, 0, 0, 0.08, 0.08);
-	dual_ur5.grasp(0.04,0.04);
-	dual_ur5.right_gripper.attachObject("chair_leg0");
-	dual_ur5.right_gripper.attachObject("chair_leg1");
-	dual_ur5.right_gripper.attachObject("chair_leg2");
-	dual_ur5.right_gripper.attachObject("chair_leg3");
+	dual_ur5.grasp(0.045,0.045); 
+
+	//！！！！！！！！！！！！！！玄学警告！！！！！！！！！！！
+	//要加sleep，不然有些组件会无法成功attach，我也不知道为什么
 	dual_ur5.left_gripper.attachObject("chair_back");
 	dual_ur5.right_gripper.attachObject("chair_surface");
+	sleep(1);
+	dual_ur5.right_gripper.attachObject("chair_leg0");
+	sleep(1);
+	dual_ur5.right_gripper.attachObject("chair_leg1");
+	sleep(1);
+	dual_ur5.right_gripper.attachObject("chair_leg2");
+	sleep(1);
+	dual_ur5.right_gripper.attachObject("chair_leg3");
 	dual_ur5.perform_action(0.4, 0.35, 0.21, M_PI/2, 0, -M_PI/2, 0.20, -0.1, 0.07, M_PI/2, 0, 0, 0.08, 0.08);
 
 	double y_left = 0.35, y_right = -0.1;
 	while(y_right < y_left)
 	{
-		y_left -= 0.01;
+		if(y_left>0.340) y_left -= 0.005;
 		y_right += 0.01;
-		bool success = dual_ur5.perform_action(0.4, y_left, 0.22, M_PI/2, 0, -M_PI/2, 0.20, y_right, 0.07, M_PI/2, 0, 0, 0.08, 0.08);
+		bool success = dual_ur5.perform_action(0.4, y_left, 0.21, M_PI/2, 0, -M_PI/2, 0.20, y_right, 0.07, M_PI/2, 0, 0, 0.08, 0.08);
 		if(!success) break;
 		std::cout << y_left << "  " << y_right << std::endl;
 	}

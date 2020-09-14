@@ -32,6 +32,11 @@ moveit配置文件：`dual_ur5_moveit_config`
 
 - config文件夹下的`controller.yaml` `fake_controllers.yaml` `ros_controllers.yaml`文件有所修改，因为原来的没有添加爪夹的控制器
 
+**9月14日更新：**学长提供的配置文件ur5每个关节可以从$-2\pi$转到$2\pi$实在是太不合理了，重新写了配置文件
+
+- 模型文件：`ur_description/dual_ur5_limited.urdf`
+- moveit配置文件：`dual_ur5_limited_moveit_config`
+
 
 
 ## planning groups:
@@ -78,7 +83,7 @@ moveit配置文件：`dual_ur5_moveit_config`
 启动rviz
 
 ```bash
-roslaunch dual_ur5_moveit_config demo.launch
+roslaunch dual_ur5_limmited_moveit_config demo.launch
 ```
 
 查看椅子的装配模型
